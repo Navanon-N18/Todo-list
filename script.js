@@ -4,6 +4,7 @@ const todoList = document.getElementById("todo-list");
 const filterBtns = document.querySelectorAll(".filter-btn");
 
 let currentFilter = "all";
+let todos = JSON.parse(localStorage.getItem("todos")) || [];
 
 addBtn.addEventListener("click", addTodo);
 
@@ -26,23 +27,47 @@ function addTodo() {
     return;
   }
 
+  const todo = { text: text, completed: false };
+  todos.push(todo);
+  saveTodos();
+  renderTodo(todo);
+
+  input.value = "";
+  applyFilter();
+}
+
+function renderTodo(todo) {
   const li = document.createElement("li");
-  li.textContent = text;
-  
+  li.textContent = todo.text;
+
+  if (todo.completed) {
+    li.classList.add("completed");
+  }
+
   li.addEventListener("click", function () {
+    todo.completed = !todo.completed;
     li.classList.toggle("completed");
+    saveTodos();
+    applyFilter();
   });
 
-  const deleteBtn =document.createElement("button");
+  const deleteBtn = document.createElement("button");
   deleteBtn.textContent = "delete";
-  deleteBtn.addEventListener("click",function(event){
+  deleteBtn.addEventListener("click", function (event) {
     event.stopPropagation();
+    todos = todos.filter(function (t) {
+      return t !== todo;
+    });
     li.remove();
+    saveTodos();
   });
-  
+
   li.appendChild(deleteBtn);
   todoList.appendChild(li);
-  input.value = "";
+}
+
+function saveTodos() {
+  localStorage.setItem("todos", JSON.stringify(todos));
 }
 
 function applyFilter() {
@@ -60,3 +85,6 @@ function applyFilter() {
     }
   });
 }
+
+todos.forEach(renderTodo);
+applyFilter();
