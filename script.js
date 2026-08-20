@@ -14,6 +14,13 @@ function addTodo() {
   const li = document.createElement("li");
   li.textContent = text;
 
+  const deleteBtn =document.createElement("button");
+  deleteBtn.textContent = "delete";
+  deleteBtn.addEventListener("click",function(){
+    li.remove();
+  });
+  
+  li.appendChild(deleteBtn);
   todoList.appendChild(li);
   input.value = "";
 }
