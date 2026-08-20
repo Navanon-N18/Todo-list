@@ -52,7 +52,7 @@ function renderTodo(todo) {
   });
 
   const deleteBtn = document.createElement("button");
-  deleteBtn.textContent = "ลบ";
+  deleteBtn.textContent = "delete";
   deleteBtn.addEventListener("click", function (event) {
     event.stopPropagation();
     todos = todos.filter(function (t) {
