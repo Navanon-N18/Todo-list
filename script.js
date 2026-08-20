@@ -1,8 +1,23 @@
 const input = document.getElementById("todo-input");
 const addBtn = document.getElementById("add-btn");
 const todoList = document.getElementById("todo-list");
+const filterBtns = document.querySelectorAll(".filter-btn");
+
+let currentFilter = "all";
 
 addBtn.addEventListener("click", addTodo);
+
+filterBtns.forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    filterBtns.forEach(function (b) {
+      b.classList.remove("active");
+    });
+    btn.classList.add("active");
+
+    currentFilter = btn.dataset.filter;
+    applyFilter();
+  });
+});
 
 function addTodo() {
   const text = input.value.trim();
@@ -28,4 +43,20 @@ function addTodo() {
   li.appendChild(deleteBtn);
   todoList.appendChild(li);
   input.value = "";
+}
+
+function applyFilter() {
+  const items = todoList.querySelectorAll("li");
+
+  items.forEach(function (item) {
+    const isCompleted = item.classList.contains("completed");
+
+    if (currentFilter === "all") {
+      item.style.display = "flex";
+    } else if (currentFilter === "active") {
+      item.style.display = isCompleted ? "none" : "flex";
+    } else if (currentFilter === "completed") {
+      item.style.display = isCompleted ? "flex" : "none";
+    }
+  });
 }
