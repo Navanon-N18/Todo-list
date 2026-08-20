@@ -13,10 +13,15 @@ function addTodo() {
 
   const li = document.createElement("li");
   li.textContent = text;
+  
+  li.addEventListener("click", function () {
+    li.classList.toggle("completed");
+  });
 
   const deleteBtn =document.createElement("button");
   deleteBtn.textContent = "delete";
-  deleteBtn.addEventListener("click",function(){
+  deleteBtn.addEventListener("click",function(event){
+    event.stopPropagation();
     li.remove();
   });
   

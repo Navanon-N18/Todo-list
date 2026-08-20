@@ -33,3 +33,15 @@ button{
     list-style: none;
     padding: 0;
 }
+li {
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.completed {
+  text-decoration: line-through;
+  color: #999;
+}
