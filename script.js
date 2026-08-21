@@ -1,10 +1,13 @@
 const input = document.getElementById("todo-input");
+const dateInput = document.getElementById("todo-date");
 const addBtn = document.getElementById("add-btn");
 const todoList = document.getElementById("todo-list");
 const filterBtns = document.querySelectorAll(".filter-btn");
 
 let currentFilter = "all";
 let todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+dateInput.valueAsDate = new Date();
 
 addBtn.addEventListener("click", addTodo);
 
@@ -16,7 +19,7 @@ filterBtns.forEach(function (btn) {
     btn.classList.add("active");
 
     currentFilter = btn.dataset.filter;
-    applyFilter();
+    renderAll();
   });
 });
 
@@ -27,17 +30,73 @@ function addTodo() {
     return;
   }
 
-  const todo = { text: text, completed: false };
-  todos.push(todo);
+  const date = dateInput.value || new Date().toISOString().split("T")[0];
+
+  todos.push({ text: text, completed: false, date: date });
   saveTodos();
-  renderTodo(todo);
 
   input.value = "";
-  applyFilter();
+  renderAll();
+}
+
+function saveTodos() {
+  localStorage.setItem("todos", JSON.stringify(todos));
+}
+
+function formatDateLabel(dateStr) {
+  const date = new Date(dateStr + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const diffDays = Math.round((date - today) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return "วันนี้";
+  if (diffDays === 1) return "พรุ่งนี้";
+  if (diffDays === -1) return "เมื่อวาน";
+
+  return date.toLocaleDateString("th-TH", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function getFilteredTodos() {
+  return todos.filter(function (todo) {
+    if (currentFilter === "active") return !todo.completed;
+    if (currentFilter === "completed") return todo.completed;
+    return true;
+  });
+}
+
+function renderAll() {
+  todoList.innerHTML = "";
+
+  const filtered = getFilteredTodos();
+
+  const grouped = {};
+  filtered.forEach(function (todo) {
+    if (!grouped[todo.date]) grouped[todo.date] = [];
+    grouped[todo.date].push(todo);
+  });
+
+  const sortedDates = Object.keys(grouped).sort();
+
+  sortedDates.forEach(function (date) {
+    const header = document.createElement("li");
+    header.classList.add("date-header");
+    header.textContent = formatDateLabel(date);
+    todoList.appendChild(header);
+
+    grouped[date].forEach(function (todo) {
+      todoList.appendChild(renderTodo(todo));
+    });
+  });
 }
 
 function renderTodo(todo) {
   const li = document.createElement("li");
+  li.classList.add("todo-item");
 
   const dot = document.createElement("span");
   dot.classList.add("status-dot");
@@ -56,47 +115,25 @@ function renderTodo(todo) {
 
   li.addEventListener("click", function () {
     todo.completed = !todo.completed;
-    li.classList.toggle("completed");
-    dot.classList.toggle("dot-done");
-    dot.classList.toggle("dot-pending");
     saveTodos();
-    applyFilter();
+    renderAll();
   });
 
   const deleteBtn = document.createElement("button");
   deleteBtn.textContent = "delete";
+  deleteBtn.classList.add("delete-btn");
   deleteBtn.addEventListener("click", function (event) {
     event.stopPropagation();
     todos = todos.filter(function (t) {
       return t !== todo;
     });
-    li.remove();
     saveTodos();
+    renderAll();
   });
 
   li.appendChild(deleteBtn);
-  todoList.appendChild(li);
+
+  return li;
 }
 
-function saveTodos() {
-  localStorage.setItem("todos", JSON.stringify(todos));
-}
-
-function applyFilter() {
-  const items = todoList.querySelectorAll("li");
-
-  items.forEach(function (item) {
-    const isCompleted = item.classList.contains("completed");
-
-    if (currentFilter === "all") {
-      item.style.display = "flex";
-    } else if (currentFilter === "active") {
-      item.style.display = isCompleted ? "none" : "flex";
-    } else if (currentFilter === "completed") {
-      item.style.display = isCompleted ? "flex" : "none";
-    }
-  });
-}
-
-todos.forEach(renderTodo);
-applyFilter();
+renderAll();
