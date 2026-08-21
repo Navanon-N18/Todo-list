@@ -52,6 +52,7 @@ button {
   border-radius: 8px;
   cursor: pointer;
   transition: opacity 0.2s;
+  background: #a2a1a1;
 }
 
 button:hover {
@@ -108,13 +109,27 @@ li:hover {
 }
 
 .completed {
-  text-decoration: line-through;
-  color: #999;
+  color: #aaa;
+  opacity: 0.6;
 }
 
-li button {
+.todo-text {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.dot-pending {
   background: #ff4d4f;
-  color: white;
-  padding: 4px 10px;
-  font-size: 12px;
+}
+
+.dot-done {
+  background: #52c41a;
 }

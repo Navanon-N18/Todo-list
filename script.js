@@ -38,7 +38,17 @@ function addTodo() {
 
 function renderTodo(todo) {
   const li = document.createElement("li");
-  li.textContent = todo.text;
+
+  const dot = document.createElement("span");
+  dot.classList.add("status-dot");
+  dot.classList.add(todo.completed ? "dot-done" : "dot-pending");
+
+  const textSpan = document.createElement("span");
+  textSpan.textContent = todo.text;
+  textSpan.classList.add("todo-text");
+
+  li.appendChild(dot);
+  li.appendChild(textSpan);
 
   if (todo.completed) {
     li.classList.add("completed");
@@ -47,6 +57,8 @@ function renderTodo(todo) {
   li.addEventListener("click", function () {
     todo.completed = !todo.completed;
     li.classList.toggle("completed");
+    dot.classList.toggle("dot-done");
+    dot.classList.toggle("dot-pending");
     saveTodos();
     applyFilter();
   });
